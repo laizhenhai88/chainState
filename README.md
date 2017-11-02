@@ -1,1 +1,3 @@
 # chainState
+>npm start
+...
