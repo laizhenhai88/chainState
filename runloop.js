@@ -37,14 +37,39 @@ module.exports = {
     let chain = 'core', state = 'start', delay = 0, count = 0, pre = '';
     try {
       while(true) {
+        // 延时
+        await sleep(delay * 1000);
+
+        // load state unit
+        let stateUnit = require(`./chain/${chain}`)[state];
+        // 判断状态是否超次数限制
+        if (stateUnit._out && count >= stateUnit._out[0]) {
+          [chain, state, delay] = anaStateStr(stateUnit._out[1], chain);
+          logger.info(`  count out ${chain}:${state} ${count}`);
+          continue;
+        }
+
+        // 判断状态是否超出总限制
+        if (stateUnit._taskOut) {
+          if (!_taskOutRecord[`${chain}:${state}`]) {
+            _taskOutRecord[`${chain}:${state}`] = 1;
+          } else {
+            _taskOutRecord[`${chain}:${state}`] ++;
+          }
+          if (_taskOutRecord[`${chain}:${state}`] > stateUnit._taskOut[0]) {
+            [chain, state, delay] = anaStateStr(stateUnit._taskOut[1], chain);
+            logger.info(`   task out ${chain}:${state} ${count}`);
+            delete _taskOutRecord[`${chain}:${state}`];
+            continue;
+          }
+        }
+
         pre = `${chain}:${state}`;
-        logger.info(`enter state ${chain}:${state} ${count+1}`);
         // every core:start will clean all task out
         if (pre == 'core:start') {
           _taskOutRecord = {};
         }
-        // load state unit
-        let stateUnit = require(`./chain/${chain}`)[state];
+        logger.info(`enter state ${chain}:${state} ${count+1}`);
         // 有别名则替换
         if (stateUnit._alias) {
           alias = stateUnit._alias.split(':');
@@ -53,10 +78,8 @@ module.exports = {
           } else if (alias.length == 2) {
             [chain, state] = alias;
           }
-          logger.info(`alias ${chain}:${state}`);
+          logger.info(`      alias ${chain}:${state}`);
         }
-        // 延时
-        await sleep(delay * 1000);
         // 加载状态代码并执行
         let result = await require(`./state/${chain}/${state}`)(nm);
         // logger.info(`  out state ${chain}:${state} - ${result}`);
@@ -68,28 +91,6 @@ module.exports = {
           count ++;
         } else {
           count = 0;
-        }
-
-        // 判断状态是否超次数限制
-        if (stateUnit._out && count >= stateUnit._out[0]) {
-          [chain, state, delay] = anaStateStr(stateUnit._out[1], chain);
-          logger.info(`  count out ${chain}:${state} ${count}`);
-          continue;
-        }
-
-        // 判断状态是否超出总限制
-        if (stateUnit._taskOut) {
-          if (!_taskOutRecord[pre]) {
-            _taskOutRecord[pre] = 1;
-          } else {
-            _taskOutRecord[pre] ++;
-          }
-          if (_taskOutRecord[pre] >= stateUnit._taskOut[0]) {
-            [chain, state, delay] = anaStateStr(stateUnit._taskOut[1], chain);
-            logger.info(`   task out ${chain}:${state} ${count}`);
-            delete _taskOutRecord[pre];
-            continue;
-          }
         }
 
         [chain, state, delay] = next;
