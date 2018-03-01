@@ -1,6 +1,6 @@
 const logger = require('./lib/logger')();
 const sleep = require('./lib/sleep');
-const core = require('./chain/core');
+const path = require('path');
 
 const anaStateStr = (stateStr, currentChain) => {
   let chain,state,delay;
@@ -41,7 +41,7 @@ module.exports = {
         await sleep(delay * 1000);
 
         // load state unit
-        let stateUnit = require(`./chain/${chain}`)[state];
+        let stateUnit = require(path.join(process.cwd(), `./chain/${chain}`))[state];
         // 判断状态是否超次数限制
         if (stateUnit._out && count >= stateUnit._out[0]) {
           [chain, state, delay] = anaStateStr(stateUnit._out[1], chain);
@@ -81,7 +81,7 @@ module.exports = {
           logger.info(`      alias ${chain}:${state}`);
         }
         // 加载状态代码并执行
-        let result = await require(`./state/${chain}/${state}`)();
+        let result = await require(path.join(process.cwd(), `./state/${chain}/${state}`))();
         // logger.info(`  out state ${chain}:${state} - ${result}`);
         if (stateUnit[result] == '') {
           break;
