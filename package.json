@@ -1,5 +1,5 @@
 {
-  "name": "chainState",
+  "name": "chain-state",
   "version": "0.0.1",
   "description": "",
   "main": "runloop.js",
@@ -10,8 +10,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "log4js": "^2.5.3",
-    "nightmare": "^2.10.0"
+    "log4js": "^2.5.3"
   },
   "repository": {
     "type": "git",
