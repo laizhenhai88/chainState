@@ -32,8 +32,8 @@ const anaStateStr = (stateStr, currentChain) => {
 let _taskOutRecord = {}
 
 module.exports = {
-  run: async (nm)=>{
-    logger.info('run...');
+  run: async (onError)=>{
+    logger.info('running...');
     let chain = 'core', state = 'start', delay = 0, count = 0, pre = '';
     try {
       while(true) {
@@ -81,7 +81,7 @@ module.exports = {
           logger.info(`      alias ${chain}:${state}`);
         }
         // 加载状态代码并执行
-        let result = await require(`./state/${chain}/${state}`)(nm);
+        let result = await require(`./state/${chain}/${state}`)();
         // logger.info(`  out state ${chain}:${state} - ${result}`);
         if (stateUnit[result] == '') {
           break;
@@ -97,7 +97,7 @@ module.exports = {
       }
     } catch(e) {
       logger.error(`run error [${chain}:${state}]`, e);
-      // TODO:上pm2的话，此处可以exit重新开始
+      onError && onError(e);
     }
   }
 }

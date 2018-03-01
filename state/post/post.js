@@ -1,3 +1,3 @@
-module.exports = async (nm) => {
+module.exports = async () => {
   return 'success';
 }
