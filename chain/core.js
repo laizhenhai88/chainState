@@ -1,6 +1,7 @@
 module.exports = {
   start : {
-    success: 'getTask:1'
+    success: 'getTask:1',
+    _error: 'failed:1',
   },
   getTask : {
     post: 'post:start:1',

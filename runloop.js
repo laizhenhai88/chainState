@@ -85,7 +85,12 @@ module.exports = {
           logger.info(`      alias ${chain}:${state}`);
         }
         // 加载状态代码并执行
-        let result = await require(path.join(process.cwd(), `./state/${chain}/${state}`))();
+        let result = '_error'
+        try{
+          result = await require(path.join(process.cwd(), `./state/${chain}/${state}`))();
+        } catch(e) {
+          logger.error(`${chain}:${state}`, e)
+        }
         // logger.info(`  out state ${chain}:${state} - ${result}`);
         if (stateUnit[result] == '') {
           break;
