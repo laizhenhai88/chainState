@@ -1,6 +1,8 @@
-const logger = require('./lib/logger')();
+const loggerFactory = require('./lib/logger');
+const logger = loggerFactory();
 const sleep = require('./lib/sleep');
 const path = require('path');
+const bb = require('./lib/bb');
 
 const anaStateStr = (stateStr, currentChain) => {
   let chain,state,delay;
@@ -32,6 +34,8 @@ const anaStateStr = (stateStr, currentChain) => {
 let _taskOutRecord = {}
 
 module.exports = {
+  bb: bb,
+  logger: loggerFactory,
   run: async (onError)=>{
     logger.info('running...');
     let chain = 'core', state = 'start', delay = 0, count = 0, pre = '';
