@@ -90,6 +90,11 @@ module.exports = {
           result = await require(path.join(process.cwd(), `./state/${chain}/${state}`))();
         } catch(e) {
           logger.error(`${chain}:${state}`, e)
+          if (stateUnit[result]) {
+            bb.set('_error', e)
+          } else {
+            throw e
+          }
         }
         // logger.info(`  out state ${chain}:${state} - ${result}`);
         if (stateUnit[result] == '') {
