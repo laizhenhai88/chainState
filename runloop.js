@@ -36,7 +36,7 @@ let _taskOutRecord = {}
 module.exports = {
   bb: bb,
   logger: loggerFactory,
-  run: async (onError)=>{
+  run: async ()=>{
     logger.info('running...');
     let chain = 'core', state = 'start', delay = 0, count = 0, pre = '';
     try {
@@ -111,7 +111,7 @@ module.exports = {
       }
     } catch(e) {
       logger.error(`run error [${chain}:${state}]`, e);
-      onError && onError(e);
+      throw e
     }
   }
 }
