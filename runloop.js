@@ -1,5 +1,4 @@
-const loggerFactory = require('./lib/logger');
-const logger = loggerFactory();
+const logger = require('laputa-log').createLogger();
 const sleep = require('./lib/sleep');
 const path = require('path');
 const bb = require('./lib/bb');
@@ -35,7 +34,6 @@ let _taskOutRecord = {}
 
 module.exports = {
   bb: bb,
-  logger: loggerFactory,
   run: async ()=>{
     logger.info('running...');
     let chain = 'core', state = 'start', delay = 0, count = 0, pre = '';
@@ -89,7 +87,7 @@ module.exports = {
         try{
           result = await require(path.join(process.cwd(), `./state/${chain}/${state}`))();
         } catch(e) {
-          logger.error(`${chain}:${state}`, e)
+          logger.error(`${chain}:${state}`, {error:e})
           if (stateUnit[result]) {
             bb.set('_error', e)
           } else {
@@ -110,7 +108,7 @@ module.exports = {
         [chain, state, delay] = next;
       }
     } catch(e) {
-      logger.error(`run error [${chain}:${state}]`, e);
+      logger.error(`run error [${chain}:${state}]`, {error:e});
       throw e
     }
   }
